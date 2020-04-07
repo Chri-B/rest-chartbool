@@ -3,22 +3,14 @@
 var objIntermedioMesi = {};
 var dataMesi = [];
 getVenditeMensili();
-
 var objIntermedioVenditori = {};
 var labelsVenditori = [];
 var dataVenditori = [];
 var totaleVendite = 0;
+var dataVenditoriPercentuale = [];
 getVenditeVenditori();
 
-// !!!!!!!!!!! NON VIENE ESEGUITO IL CICLO !!!!!!!!!!
-for (var i = 0; i < dataVenditori.length; i++) {
-    totaleVendite += dataVenditori[i];
-    console.log(totaleVendite);
-}
-for (var i = 0; i < dataVenditori.length; i++) {
-    dataVenditori[i] = (dataVenditori[i] / totaleVendite);
-}
-console.log(totaleVendite);
+
 
 
 // grafico-line per andamento vendite mensili complessive
@@ -42,7 +34,7 @@ var pieChart = new Chart($('#grafico-pie'), {
         labels: labelsVenditori,
         datasets: [{
             label: 'Vendite Mensili',
-            data: dataVenditori,
+            data: dataVenditoriPercentuale,
             backgroundColor: ['lightgreen', 'lightblue', 'lightcoral', 'yellow']
         }]
     }
@@ -86,6 +78,8 @@ function getDatiMesi(array) {
         }
         objIntermedioMesi[meseVendita] += oggettoSingolo.amount;
     }
+    // !!!!!!!!!!! NON VIENE ESEGUITO IL CICLO !!!!!!!!!!
+    // DEVO INSERIRLO PER FORZA DENTRO LA FUNZIONE! ALTRIMENTI E' INVISIBILE
     for (var key in objIntermedioMesi) {
         // labelsPC.push(key);
         dataMesi.push(objIntermedioMesi[key]);
@@ -105,4 +99,15 @@ function getDatiVenditori(array) {
         labelsVenditori.push(key);
         dataVenditori.push(objIntermedioVenditori[key]);
     }
+    // !!!!!!!!!!! NON VIENE ESEGUITO IL CICLO !!!!!!!!!!
+    // DEVO INSERIRLO PER FORZA DENTRO LA FUNZIONE! ALTRIMENTI E' INVISIBILE
+    for (var i = 0; i < dataVenditori.length; i++) {
+        totaleVendite += dataVenditori[i];
+    }
+
+    for (var i = 0; i < dataVenditori.length; i++) {
+        dataVenditori[i] = ((dataVenditori[i] / totaleVendite) * 100);
+        dataVenditoriPercentuale[i] = Math.round(dataVenditori[i] * 100) / 100;
+    }
+    console.log(dataVenditoriPercentuale);
 }
