@@ -4,12 +4,25 @@
     box-sizing: border-box;
 }
 
-.container {
+.container-big {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.interaction {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px;
+}
+
+.container {
     display: flex;
     align-items: center;
 }
 
 .chart-container {
     width: 50%;
+    padding: 0 20px;
 }

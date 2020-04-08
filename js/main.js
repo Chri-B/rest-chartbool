@@ -17,65 +17,92 @@ $.ajax({
     method: 'GET',
     success: function (data) {
         var costruttore = costruttoreDatiVenditori(data);
-        costruttoreGraficoPie(costruttore.venditori, costruttore.venditePercentuali);
+        var datiVenditePercentuali = getPercentualiVendite(costruttore.data)
+        costruttoreGraficoPie(costruttore.labels, datiVenditePercentuali);
     },
     error: function (err) {
         alert('errore richiesta');
     }
 });
 
+$('#invia-dati').click(function() {
+    var venditoreSelezionato = $('#selezione-venditore').val();
+    var giornoSelezionato = moment($('#input-giorno').val()).format('DD-MM-YYYY');
+    var valoreInput = parseInt($('#input-vendita').val());
+    // $('#input-vendita').val('');
+    // $.ajax({
+    //     url: 'http://157.230.17.132:4002/sales',
+    //     method: 'POST',
+    //     data: {
+    //         salesman: venditoreSelezionato,
+    //         date: meseSelezionato,
+    //         amount: valoreInput
+    //     },
+    //     success: function (data) {
+    //     },
+    //     error: function (err) {
+    //         alert('errore aggiunta dati');
+    //     }
+    // });
+    console.log(venditoreSelezionato);
+    console.log(giornoSelezionato);
+    console.log(valoreInput);
+});
 
 // funzione per ricavare i dati delle vendite mensili
 function costruttoreDatiMesi(array) {
-    var objIntermedioMesi = {};
+    var objIntermedio = {};
+    var dataPC = [];
     for (var i = 0; i < array.length; i++) {
         var oggettoSingolo = array[i];
         var giornoVendita = oggettoSingolo.date;
         var meseVendita = moment(giornoVendita, "DD-MM-YYYY").clone().month(); // ottengo i numeri dei mesi che escono già ordinati nell'oggetto
-        if (objIntermedioMesi[meseVendita] === undefined) {
-            objIntermedioMesi[meseVendita] = 0;
+        if (objIntermedio[meseVendita] === undefined) {
+            objIntermedio[meseVendita] = 0;
         }
-        objIntermedioMesi[meseVendita] += oggettoSingolo.amount;
+        objIntermedio[meseVendita] += oggettoSingolo.amount;
     }
-    var dataMesi = [];
-    for (var key in objIntermedioMesi) {
-        // labelsPC.push(key);
-        dataMesi.push(objIntermedioMesi[key]);
+    for (var key in objIntermedio) {
+        dataPC.push(objIntermedio[key]);
     }
-    return dataMesi;
+    return dataPC;
 };
 
 // funzione per ricavare i dati delle vendite annuali per ogni venditore
 function costruttoreDatiVenditori(array) {
-    var objIntermedioVenditori = {};
-    var labelsVenditori = [];
-    var dataVenditori = [];
-    var totaleVendite = 0;
-    var dataVenditoriPercentuale = [];
-
+    var objIntermedio = {};
+    var labelsPC = [];
+    var dataPC = [];
     for (var i = 0; i < array.length; i++) {
         var oggettoSingolo = array[i];
         var venditore = oggettoSingolo.salesman;
-        if (objIntermedioVenditori[venditore] === undefined) {
-            objIntermedioVenditori[venditore] = 0;
+        if (objIntermedio[venditore] === undefined) {
+            objIntermedio[venditore] = 0;
         }
-        objIntermedioVenditori[venditore] += oggettoSingolo.amount;
+        objIntermedio[venditore] += oggettoSingolo.amount;
     }
-    for (var key in objIntermedioVenditori) {
-        labelsVenditori.push(key);
-        dataVenditori.push(objIntermedioVenditori[key]);
-    }
-    for (var i = 0; i < dataVenditori.length; i++) {
-        totaleVendite += dataVenditori[i];
-    }
-    for (var i = 0; i < dataVenditori.length; i++) {
-        dataVenditori[i] = ((dataVenditori[i] / totaleVendite) * 100);
-        dataVenditoriPercentuale[i] = Math.round(dataVenditori[i] * 100) / 100;
+    for (var key in objIntermedio) {
+        labelsPC.push(key);
+        dataPC.push(objIntermedio[key]);
     }
     return {
-        venditePercentuali: dataVenditoriPercentuale,
-        venditori: labelsVenditori
+        data: dataPC,
+        labels: labelsPC
     }
+}
+
+// funzione per ricavare le percentuali di vendita annue
+function getPercentualiVendite(dataVend) {
+    var totaleVendite = 0;
+    var dataVenditoriPercentuale = [];
+
+    for (var i = 0; i < dataVend.length; i++) {
+        totaleVendite += dataVend[i];
+    }
+    for (var i = 0; i < dataVend.length; i++) {
+        dataVend[i] = ((dataVend[i] / totaleVendite) * 100).toFixed(1);
+    }
+    return dataVend;
 }
 
 // costruzione grafico-line per andamento vendite mensili complessive

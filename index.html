@@ -12,12 +12,26 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js" integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div class="container">
-            <div class="chart-container">
-                <canvas id="grafico-line"></canvas>
+        <div class="container-big">
+            <div class="interaction">
+                <select id="selezione-venditore">
+                    <option value="">Selezione Venditore</option>
+                    <option value="Marco">Marco</option>
+                    <option value="Giuseppe">Giuseppe</option>
+                    <option value="Riccardo">Riccardo</option>
+                    <option value="Roberto">Roberto</option>
+                </select>
+                <input id="input-giorno" type="date" min="2017-01-01" max="2017-12-31">
+                <input id="input-vendita" placeholder="valore vendita">
+                <button id="invia-dati">invia dati</button>
             </div>
-            <div class="chart-container">
-                <canvas id="grafico-pie"></canvas>
+            <div class="container">
+                <div class="chart-container">
+                    <canvas id="grafico-line"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="grafico-pie"></canvas>
+                </div>
             </div>
         </div>
 
