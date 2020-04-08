@@ -1,53 +1,64 @@
 // primo grafico line con dati vendite mensili
-$.ajax({
-    url: 'http://157.230.17.132:4002/sales',
-    method: 'GET',
-    success: function (data) {
-        var costruttore = costruttoreDatiMesi(data);
-        costruttoreGraficoLine(costruttore);
-    },
-    error: function (err) {
-        alert('errore richiesta');
-    }
-});
+getVenditeMensili();
 
 // secondo grafico pie con dati vendite percentuali annuali per venditore
-$.ajax({
-    url: 'http://157.230.17.132:4002/sales',
-    method: 'GET',
-    success: function (data) {
-        var costruttore = costruttoreDatiVenditori(data);
-        var datiVenditePercentuali = getPercentualiVendite(costruttore.data)
-        costruttoreGraficoPie(costruttore.labels, datiVenditePercentuali);
-    },
-    error: function (err) {
-        alert('errore richiesta');
-    }
-});
+getVenditeAnnueVenditori();
 
 $('#invia-dati').click(function() {
-    var venditoreSelezionato = $('#selezione-venditore').val();
-    var giornoSelezionato = moment($('#input-giorno').val()).format('DD-MM-YYYY');
-    var valoreInput = parseInt($('#input-vendita').val());
-    // $('#input-vendita').val('');
-    // $.ajax({
-    //     url: 'http://157.230.17.132:4002/sales',
-    //     method: 'POST',
-    //     data: {
-    //         salesman: venditoreSelezionato,
-    //         date: meseSelezionato,
-    //         amount: valoreInput
-    //     },
-    //     success: function (data) {
-    //     },
-    //     error: function (err) {
-    //         alert('errore aggiunta dati');
-    //     }
-    // });
-    console.log(venditoreSelezionato);
-    console.log(giornoSelezionato);
-    console.log(valoreInput);
+    $('#grafico-line').empty();
+    $('#grafico-pie').empty();
+    $.ajax({
+        url: 'http://157.230.17.132:4002/sales',
+        method: 'POST',
+        data: {
+            salesman: $('#selezione-venditore').val(),
+            amount: $('#input-vendita').val(),
+            date: moment($('#input-giorno').val()).format('DD-MM-YYYY')
+        },
+        success: function (data) {
+        },
+        error: function (err) {
+            alert('errore aggiunta dati');
+        }
+    });
+    getVenditeMensili();
+    getVenditeAnnueVenditori();
+
+
+    // console.log(venditoreSelezionato);
+    // console.log(giornoSelezionato);
+    // console.log(valoreInput);
 });
+
+
+function getVenditeMensili() {
+    $.ajax({
+        url: 'http://157.230.17.132:4002/sales',
+        method: 'GET',
+        success: function (data) {
+            var costruttore = costruttoreDatiMesi(data);
+            costruttoreGraficoLine(costruttore);
+        },
+        error: function (err) {
+            alert('errore richiesta');
+        }
+    });
+}
+
+function getVenditeAnnueVenditori() {
+    $.ajax({
+        url: 'http://157.230.17.132:4002/sales',
+        method: 'GET',
+        success: function (data) {
+            var costruttore = costruttoreDatiVenditori(data);
+            var datiVenditePercentuali = getPercentualiVendite(costruttore.data)
+            costruttoreGraficoPie(costruttore.labels, datiVenditePercentuali);
+        },
+        error: function (err) {
+            alert('errore richiesta');
+        }
+    });
+}
 
 // funzione per ricavare i dati delle vendite mensili
 function costruttoreDatiMesi(array) {
@@ -60,7 +71,7 @@ function costruttoreDatiMesi(array) {
         if (objIntermedio[meseVendita] === undefined) {
             objIntermedio[meseVendita] = 0;
         }
-        objIntermedio[meseVendita] += oggettoSingolo.amount;
+        objIntermedio[meseVendita] += parseInt(oggettoSingolo.amount);
     }
     for (var key in objIntermedio) {
         dataPC.push(objIntermedio[key]);
@@ -79,7 +90,7 @@ function costruttoreDatiVenditori(array) {
         if (objIntermedio[venditore] === undefined) {
             objIntermedio[venditore] = 0;
         }
-        objIntermedio[venditore] += oggettoSingolo.amount;
+        objIntermedio[venditore] += parseInt(oggettoSingolo.amount);
     }
     for (var key in objIntermedio) {
         labelsPC.push(key);
