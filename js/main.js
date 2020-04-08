@@ -4,33 +4,14 @@ getVenditeMensili();
 // secondo grafico pie con dati vendite percentuali annuali per venditore
 getVenditeAnnueVenditori();
 
+// al click vengono aggiunti i nuovi dati e aggiornati i grafici
 $('#invia-dati').click(function() {
-    $('#grafico-line').empty();
-    $('#grafico-pie').empty();
-    $.ajax({
-        url: 'http://157.230.17.132:4002/sales',
-        method: 'POST',
-        data: {
-            salesman: $('#selezione-venditore').val(),
-            amount: $('#input-vendita').val(),
-            date: moment($('#input-giorno').val()).format('DD-MM-YYYY')
-        },
-        success: function (data) {
-        },
-        error: function (err) {
-            alert('errore aggiunta dati');
-        }
-    });
+    updateCharts();
     getVenditeMensili();
     getVenditeAnnueVenditori();
-
-
-    // console.log(venditoreSelezionato);
-    // console.log(giornoSelezionato);
-    // console.log(valoreInput);
 });
 
-
+// chiamata API per raggiungere i dati relativi a vendite mensili
 function getVenditeMensili() {
     $.ajax({
         url: 'http://157.230.17.132:4002/sales',
@@ -45,6 +26,7 @@ function getVenditeMensili() {
     });
 }
 
+// chiamata API per raggiungere i dati relativi alle vendite annuali di ogni venditore
 function getVenditeAnnueVenditori() {
     $.ajax({
         url: 'http://157.230.17.132:4002/sales',
@@ -145,4 +127,25 @@ function costruttoreGraficoPie(datiLabels, dati) {
             }]
         }
     });
+}
+
+// aggiornamento grafico con nuovi dati inseriti
+function updateCharts() {
+    $('#grafico-line').empty();
+    $('#grafico-pie').empty();
+    $.ajax({
+        url: 'http://157.230.17.132:4002/sales',
+        method: 'POST',
+        data: {
+            salesman: $('#selezione-venditore').val(),
+            amount: $('#input-vendita').val(),
+            date: moment($('#input-giorno').val()).format('DD-MM-YYYY')
+        },
+        success: function (data) {
+        },
+        error: function (err) {
+            alert('errore aggiunta dati');
+        }
+    });
+
 }
