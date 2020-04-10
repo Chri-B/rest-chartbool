@@ -154,8 +154,7 @@ function costruttoreGraficoBar(dati) {
                 data: dati,
                 backgroundColor: ['rgba(42, 201, 217, 0.2)', 'rgba(254, 0, 0, 0.2)', 'rgba(250, 255, 9, 0.5)', 'rgba(210, 55, 223, 0.3)'],
                 borderColor: ['rgb(42, 201, 217)', 'rgb(254, 0, 0)', 'rgb(251, 196, 0)', 'rgb(210, 55, 223)'],
-                borderWidth: 1,
-                borderWidth: 'bottom'
+                borderWidth: 1
             }]
         }
     });
