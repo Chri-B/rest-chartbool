@@ -1,40 +1,24 @@
-// primo grafico line con dati vendite mensili
-getVenditeMensili();
-
-// secondo grafico pie con dati vendite percentuali annuali per venditore
-getVenditeAnnueVenditori();
+// grafici line con dati vendite mensili
+stampaGraficiFinali();
 
 // al click vengono aggiunti i nuovi dati e aggiornati i grafici
 $('#invia-dati').click(function() {
     updateCharts();
-    getVenditeMensili();
-    getVenditeAnnueVenditori();
 });
 
-// chiamata API per raggiungere i dati relativi a vendite mensili
-function getVenditeMensili() {
-    $.ajax({
-        url: 'http://157.230.17.132:4002/sales',
-        method: 'GET',
-        success: function (data) {
-            var costruttore = costruttoreDatiMesi(data);
-            costruttoreGraficoLine(costruttore);
-        },
-        error: function (err) {
-            alert('errore richiesta');
-        }
-    });
-}
-
 // chiamata API per raggiungere i dati relativi alle vendite annuali di ogni venditore
-function getVenditeAnnueVenditori() {
+function stampaGraficiFinali() {
     $.ajax({
         url: 'http://157.230.17.132:4002/sales',
         method: 'GET',
         success: function (data) {
-            var costruttore = costruttoreDatiVenditori(data);
-            var datiVenditePercentuali = getPercentualiVendite(costruttore.data)
-            costruttoreGraficoPie(costruttore.labels, datiVenditePercentuali);
+            var costruttoreMesi = costruttoreDatiMesi(data);
+            costruttoreGraficoLine(costruttoreMesi);
+            var costruttoreVenditori = costruttoreDatiVenditori(data);
+            var datiVenditePercentuali = getPercentualiVendite(costruttoreVenditori.data)
+            costruttoreGraficoPie(costruttoreVenditori.labels, datiVenditePercentuali);
+            var costruttoreQuarter = costruttoreDatiQuarter(data);
+            costruttoreGraficoBar(costruttoreQuarter);
         },
         error: function (err) {
             alert('errore richiesta');
@@ -54,6 +38,25 @@ function costruttoreDatiMesi(array) {
             objIntermedio[meseVendita] = 0;
         }
         objIntermedio[meseVendita] += parseInt(oggettoSingolo.amount);
+    }
+    for (var key in objIntermedio) {
+        dataPC.push(objIntermedio[key]);
+    }
+    return dataPC;
+};
+
+// funzione per ricavare i dati delle vendite quadrimestrali
+function costruttoreDatiQuarter(array) {
+    var objIntermedio = {};
+    var dataPC = [];
+    for (var i = 0; i < array.length; i++) {
+        var oggettoSingolo = array[i];
+        var giornoVendita = oggettoSingolo.date;
+        var quarterVendita = moment(giornoVendita, "DD-MM-YYYY").quarter(); // ottengo i numeri dei quadrimestri
+        if (objIntermedio[quarterVendita] === undefined) {
+            objIntermedio[quarterVendita] = 0;
+        }
+        objIntermedio[quarterVendita] += parseInt(oggettoSingolo.amount);
     }
     for (var key in objIntermedio) {
         dataPC.push(objIntermedio[key]);
@@ -106,7 +109,8 @@ function costruttoreGraficoLine(dati) {
             labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
             datasets: [{
                 label: 'Vendite Mensili',
-                borderColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(0, 8, 198)',
+                backgroundColor: 'rgba(0, 8, 198, 0.2)',
                 data: dati,
                 lineTension: 0,
             }]
@@ -125,23 +129,50 @@ function costruttoreGraficoPie(datiLabels, dati) {
                 data: dati,
                 backgroundColor: ['lightgreen', 'lightblue', 'lightcoral', 'yellow']
             }]
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+                    }
+                }
+            }
+        }
+    });
+}
+
+// costruzione grafico-bar per andamento vendite quadrimestrali
+function costruttoreGraficoBar(dati) {
+    var barChart = new Chart($('#grafico-bar'), {
+        type: 'bar',
+        data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            datasets: [{
+                label: 'Quadrimestre',
+                data: dati,
+                backgroundColor: ['rgba(42, 201, 217, 0.2)', 'rgba(254, 0, 0, 0.2)', 'rgba(250, 255, 9, 0.5)', 'rgba(210, 55, 223, 0.3)'],
+                borderColor: ['rgb(42, 201, 217)', 'rgb(254, 0, 0)', 'rgb(251, 196, 0)', 'rgb(210, 55, 223)'],
+                borderWidth: 1,
+                borderWidth: 'bottom'
+            }]
         }
     });
 }
 
 // aggiornamento grafico con nuovi dati inseriti
 function updateCharts() {
-    $('#grafico-line').empty();
-    $('#grafico-pie').empty();
     $.ajax({
         url: 'http://157.230.17.132:4002/sales',
         method: 'POST',
         data: {
             salesman: $('#selezione-venditore').val(),
             amount: $('#input-vendita').val(),
-            date: moment($('#input-giorno').val()).format('DD-MM-YYYY')
+            date: moment($('#input-giorno').val(), 'YYYY-MM-DD').format('DD/MM/YYYY')
         },
         success: function (data) {
+            stampaGraficiFinali();
         },
         error: function (err) {
             alert('errore aggiunta dati');
