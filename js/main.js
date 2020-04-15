@@ -1,4 +1,7 @@
 // grafici line con dati vendite mensili
+var lineChart = {};
+var pieChart = {};
+var barChart = {};
 stampaGraficiFinali();
 
 // al click vengono aggiunti i nuovi dati e aggiornati i grafici
@@ -103,61 +106,79 @@ function getPercentualiVendite(dataVend) {
 
 // costruzione grafico-line per andamento vendite mensili complessive
 function costruttoreGraficoLine(dati) {
-    var lineChart = new Chart($('#grafico-line'), {
-        type: 'line',
-        data: {
-            labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
-            datasets: [{
-                label: 'Vendite Mensili',
-                borderColor: 'rgb(0, 8, 198)',
-                backgroundColor: 'rgba(0, 8, 198, 0.2)',
-                data: dati,
-                lineTension: 0,
-            }]
-        }
-    });
+    if ($.isEmptyObject(lineChart)) {
+        lineChart = new Chart($('#grafico-line'), {
+            type: 'line',
+            data: {
+                labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+                datasets: [{
+                    label: 'Vendite Mensili',
+                    borderColor: 'rgb(0, 8, 198)',
+                    backgroundColor: 'rgba(0, 8, 198, 0.2)',
+                    data: dati,
+                    lineTension: 0,
+                }]
+            }
+        });
+    } else {
+        lineChart.data.labels = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+        lineChart.data.datasets[0].data = dati;
+        lineChart.update();
+    }
 }
 
 // costruzione grafico-pie per andamento vendite per venditore
 function costruttoreGraficoPie(datiLabels, dati) {
-    var pieChart = new Chart($('#grafico-pie'), {
-        type: 'pie',
-        data: {
-            labels: datiLabels,
-            datasets: [{
-                label: 'Vendite Mensili',
-                data: dati,
-                backgroundColor: ['lightgreen', 'lightblue', 'lightcoral', 'yellow']
-            }]
-        },
-        options: {
-            responsive: true,
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+    if ($.isEmptyObject(pieChart)) {
+        pieChart = new Chart($('#grafico-pie'), {
+            type: 'pie',
+            data: {
+                labels: datiLabels,
+                datasets: [{
+                    label: 'Vendite Mensili',
+                    data: dati,
+                    backgroundColor: ['lightgreen', 'lightblue', 'lightcoral', 'yellow']
+                }]
+            },
+            options: {
+                responsive: true,
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        pieChart.data.labels = datiLabels;
+        pieChart.data.datasets[0].data = dati;
+        pieChart.update();
+    }
 }
 
 // costruzione grafico-bar per andamento vendite quadrimestrali
 function costruttoreGraficoBar(dati) {
-    var barChart = new Chart($('#grafico-bar'), {
-        type: 'bar',
-        data: {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            datasets: [{
-                label: 'Quadrimestre',
-                data: dati,
-                backgroundColor: ['rgba(42, 201, 217, 0.2)', 'rgba(254, 0, 0, 0.2)', 'rgba(250, 255, 9, 0.5)', 'rgba(210, 55, 223, 0.3)'],
-                borderColor: ['rgb(42, 201, 217)', 'rgb(254, 0, 0)', 'rgb(251, 196, 0)', 'rgb(210, 55, 223)'],
-                borderWidth: 1
-            }]
-        }
-    });
+    if ($.isEmptyObject(barChart)) {
+        barChart = new Chart($('#grafico-bar'), {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Quadrimestre',
+                    data: dati,
+                    backgroundColor: ['rgba(42, 201, 217, 0.2)', 'rgba(254, 0, 0, 0.2)', 'rgba(250, 255, 9, 0.5)', 'rgba(210, 55, 223, 0.3)'],
+                    borderColor: ['rgb(42, 201, 217)', 'rgb(254, 0, 0)', 'rgb(251, 196, 0)', 'rgb(210, 55, 223)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+    } else {
+        barChart.data.labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+        barChart.data.datasets[0].data = dati;
+        barChart.update();
+    }
 }
 
 // aggiornamento grafico con nuovi dati inseriti
